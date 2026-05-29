@@ -29,8 +29,7 @@
         "pages": [
           "introduction",
           "quickstart",
-          "core-concepts",
-          "team"
+          "core-concepts"
         ]
       },
       {
@@ -45,7 +44,6 @@
           "api-reference/batch-scrape",
           "api-reference/extract",
           "api-reference/deep-research",
-          "api-reference/llmstxt",
           "api-reference/fireclaw"
         ]
       },
@@ -56,14 +54,7 @@
           "api-reference/crawl-status",
           "api-reference/batch-scrape-status",
           "api-reference/extract-status",
-          "api-reference/deep-research-status",
-          "api-reference/llmstxt-status"
-        ]
-      },
-      {
-        "group": "Usage & Queue Telemetry",
-        "pages": [
-          "api-reference/team-metrics"
+          "api-reference/deep-research-status"
         ]
       },
       {
