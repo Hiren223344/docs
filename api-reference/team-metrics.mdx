@@ -1,0 +1,97 @@
+---
+title: "Team Metrics & Telemetry"
+api: "GET /v1/team/credit-usage"
+description: "Review credit consumption statistics, token throughput metrics, and background worker queue backlogs"
+---
+
+Monitor credit allocation balances, assess daily LLM token usages, and review background crawling queue loads.
+
+---
+
+### Response Fields
+
+<ResponseField name="success" type="boolean" required>
+  Confirms telemetry fetch completed.
+</ResponseField>
+
+<ResponseField name="credits" type="object" required>
+  Details credit usage balances.
+  
+  <Expandable title="Credit Metrics">
+    <ResponseField name="allocated" type="string" required>
+      The total allocated credit pool (formatted as a Monospace string, e.g. `"10000.00"`).
+    </ResponseField>
+    <ResponseField name="consumed" type="string" required>
+      The consumed credits.
+    </ResponseField>
+    <ResponseField name="remaining" type="string" required>
+      The available credit balance.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK (Credit Usage stats)
+{
+  "success": true,
+  "credits": {
+    "allocated": "10000.00",
+    "consumed": "1452.47",
+    "remaining": "8547.53"
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Token Throughput Metrics
+
+### `GET /v1/team/token-usage`
+
+Retrieve a structured breakdown of inputs, outputs, and aggregate token throughput dispatched through Fearch's semantic extraction and deep research pipelines.
+
+```bash Curl
+curl -X GET https://search.frenix.sh/v1/team/token-usage
+```
+
+### Response Example
+
+```json 200 OK
+{
+  "success": true,
+  "tokens": {
+    "inputTokens": "4287140",
+    "outputTokens": "1298450",
+    "totalTokens": "5585590"
+  }
+}
+```
+
+---
+
+## Background Worker Queue Status
+
+### `GET /v1/team/queue-status`
+
+Inspect Fearch's background worker queues to evaluate task delays, worker availability ratios, and the length of backlogged site crawls or structured extractions.
+
+```bash Curl
+curl -X GET https://search.frenix.sh/v1/team/queue-status
+```
+
+### Response Example
+
+```json 200 OK
+{
+  "success": true,
+  "queues": {
+    "crawlQueueLength": 2,
+    "scrapeQueueLength": 0,
+    "extractQueueLength": 1,
+    "deepResearchQueueLength": 0,
+    "activeWorkersCount": 16,
+    "maxWorkersCapacity": 64
+  }
+}
+```

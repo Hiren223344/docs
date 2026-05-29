@@ -1,0 +1,56 @@
+---
+title: "Extraction Progress"
+api: "GET /v1/extract/{jobId}"
+description: "Check the status of a structured data extraction job or fetch your parsed JSON payload"
+---
+
+Query active extraction workers, monitor pipeline status, and fetch structured schemas once compilation concludes.
+
+---
+
+### Path Parameters
+
+<ParamField path="jobId" type="string" placeholder="extract-443b-2a1c" required>
+  The unique uuid code identifying the active structured extraction task.
+</ParamField>
+
+---
+
+### Response Fields
+
+<ResponseField name="success" type="boolean" required>
+  Confirms the status query execution.
+</ResponseField>
+
+<ResponseField name="status" type="string" required>
+  The current state of the extraction. Values include:
+  - `queued`: Extraction is waiting in the task pool.
+  - `processing`: Reading markdown elements and mapping them to schema properties.
+  - `completed`: Extraction complete; structured JSON results are populated.
+  - `failed`: Extraction failed due to bad schemas or site unreachability.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  Available exclusively when status is `completed`. Encloses the extracted key-value objects matching your schema constraints.
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK (Completed Extraction)
+{
+  "success": true,
+  "jobId": "extract-443b-2a1c",
+  "status": "completed",
+  "data": {
+    "title": "Wireless Earbuds Premium",
+    "price": "$89.99",
+    "rating": 4.7,
+    "features": [
+      "Active Noise Cancellation",
+      "Bluetooth 5.3",
+      "IPX7 Waterproof rating",
+      "30 hours battery playback"
+    ]
+  }
+}
+```
+</ResponseExample>

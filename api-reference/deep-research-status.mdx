@@ -1,0 +1,51 @@
+---
+title: "Research Status"
+api: "GET /v1/deep-research/{jobId}"
+description: "Monitor recursive deep research agent loops or download compiled final reports"
+---
+
+Deep research agent loops are comprehensive tasks. Use this endpoint to inspect active search loops, check research logs, or retrieve the synthesized final research document.
+
+---
+
+### Path Parameters
+
+<ParamField path="jobId" type="string" placeholder="research-772c-88d9" required>
+  The unique uuid code identifying the active deep research task.
+</ParamField>
+
+---
+
+### Response Fields
+
+<ResponseField name="success" type="boolean" required>
+  Confirms status check execution.
+</ResponseField>
+
+<ResponseField name="status" type="string" required>
+  The current progress phase of the AI agent. Values include:
+  - `searching`: AI is querying search nodes for relevant links.
+  - `analyzing`: Scraping top pages and compiling facts.
+  - `compiling`: Synthesizing final data blocks.
+  - `completed`: Research complete; report is compiled.
+</ResponseField>
+
+<ResponseField name="searchesConducted" type="number" required>
+  The total number of unique queries the AI agent dispatched to web databases.
+</ResponseField>
+
+<ResponseField name="report" type="string">
+  Available once status is `completed`. Encloses the highly comprehensive, multi-section Markdown report.
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK (Completed Research)
+{
+  "success": true,
+  "jobId": "research-772c-88d9",
+  "status": "completed",
+  "searchesConducted": 14,
+  "report": "# Comprehensive AI Research Report: Artificial Intelligence\n\n## Executive Summary\nArtificial Intelligence (AI) refers to the simulation of human intelligence processes by machines...\n\n## Detailed Findings\n1. Deep Learning Networks have evolved...\n2. Transformers dominate modern language interfaces..."
+}
+```
+</ResponseExample>

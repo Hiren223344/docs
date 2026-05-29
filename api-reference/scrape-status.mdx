@@ -1,0 +1,79 @@
+---
+title: "Scrape Status & Health"
+api: "GET /v1/scrape/{jobId}"
+description: "Check the rendering status of a scrape task or evaluate active concurrency load"
+---
+
+Monitor the execution status of a single scraping task or query system capacity metrics before dispatching massive bulk batches.
+
+---
+
+### Path Parameters
+
+<ParamField path="jobId" type="string" placeholder="scrape-443b-2a1c" required>
+  The unique uuid code returned by the scrape task when launched.
+</ParamField>
+
+---
+
+### Response Fields
+
+<ResponseField name="success" type="boolean" required>
+  Confirms the status check succeeded.
+</ResponseField>
+
+<ResponseField name="status" type="string" required>
+  The progress state of the scraper. Values include:
+  - `rendering`: Headless browser is active and loading JavaScript components.
+  - `parsing`: Markdown heuristic engine is extracting text structures.
+  - `completed`: Scrape finished; markdown and metadata are ready.
+  - `failed`: Scraper thread crashed or proxy wall failed to bypass.
+</ResponseField>
+
+<ResponseField name="result" type="object">
+  Available only when status is `completed`. Encloses the extracted GFM `markdown` content and DOM `metadata`.
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK (Completed Scrape)
+{
+  "success": true,
+  "status": "completed",
+  "result": {
+    "markdown": "# Home - Frenix\n\nSearch and scrape APIs built for developer speed.",
+    "metadata": {
+      "title": "Home - Frenix",
+      "sourceURL": "https://frenix.sh",
+      "statusCode": 200
+    }
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## System Concurrency Check
+
+### `GET /v1/concurrency-check`
+
+Evaluate active browser clusters, network load conditions, and thread availability. This is useful for scheduling large automation cron sequences during low-load intervals.
+
+```bash Curl
+curl -X GET https://search.frenix.sh/v1/concurrency-check
+```
+
+### Response Example
+
+```json 200 OK
+{
+  "success": true,
+  "metrics": {
+    "activeBrowsers": 14,
+    "maxBrowsers": 50,
+    "queuedTasks": 3,
+    "systemLoad": 0.28,
+    "hasCapacity": true
+  }
+}
+```

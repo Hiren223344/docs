@@ -28,21 +28,46 @@
         "group": "Getting Started",
         "pages": [
           "introduction",
-          "quickstart"
+          "quickstart",
+          "core-concepts",
+          "team"
         ]
       },
       {
-        "group": "API Reference",
+        "group": "Core API Services",
         "pages": [
           "api-reference/overview",
           "api-reference/root",
           "api-reference/search",
           "api-reference/scrape",
-          "api-reference/crawl"
+          "api-reference/crawl",
+          "api-reference/map",
+          "api-reference/batch-scrape",
+          "api-reference/extract",
+          "api-reference/deep-research",
+          "api-reference/llmstxt",
+          "api-reference/fireclaw"
         ]
       },
       {
-        "group": "SDKs & Integrations",
+        "group": "Job Status & Control",
+        "pages": [
+          "api-reference/scrape-status",
+          "api-reference/crawl-status",
+          "api-reference/batch-scrape-status",
+          "api-reference/extract-status",
+          "api-reference/deep-research-status",
+          "api-reference/llmstxt-status"
+        ]
+      },
+      {
+        "group": "Usage & Queue Telemetry",
+        "pages": [
+          "api-reference/team-metrics"
+        ]
+      },
+      {
+        "group": "SDKs & UI Components",
         "pages": [
           "sdk-reference/overview",
           "sdk-reference/ui-components"

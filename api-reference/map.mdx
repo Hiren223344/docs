@@ -1,0 +1,48 @@
+---
+title: "Map Site Links"
+api: "POST /v1/map"
+description: "Scan an origin domain and extract a complete hierarchy of internal links"
+---
+
+The map endpoint acts as a high-speed domain mapper. It searches through the HTML anchor layout of a target origin, gathers internal links, filters out external URLs or duplicate paths, and outputs a structured list representing the site's link hierarchy.
+
+---
+
+### Request Body
+
+<ParamField body="url" type="string" placeholder="https://example.com" required>
+  The starting target origin URL to map. All discovered links are filtered to ensure they belong to this exact same host domain.
+</ParamField>
+
+---
+
+### Response Fields
+
+<ResponseField name="success" type="boolean" required>
+  Confirms the execution status. Returns `true` if the domain was successfully resolved and scanned.
+</ResponseField>
+
+<ResponseField name="url" type="string" required>
+  The validated target domain origin URL that was mapped.
+</ResponseField>
+
+<ResponseField name="links" type="array" required>
+  An array containing all discovered unique internal links matching the target domain host.
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "url": "https://example.com",
+  "links": [
+    "https://example.com/",
+    "https://example.com/about",
+    "https://example.com/contact",
+    "https://example.com/services",
+    "https://example.com/blog",
+    "https://example.com/terms"
+  ]
+}
+```
+</ResponseExample>

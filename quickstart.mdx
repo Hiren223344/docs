@@ -68,6 +68,35 @@ Let's walk through how to execute your first requests using standard command-lin
 
     You will receive a job receipt containing a `jobId` so that you can monitor the crawl execution.
   </Step>
+
+  <Step title="Map a Website's Link Tree">
+    Extract all internal links of a site to generate a structured map of the domain.
+    
+    ```bash Curl
+    curl -X POST https://search.frenix.sh/v1/map \
+      -H "Content-Type: application/json" \
+      -d '{
+        "url": "https://example.com"
+      }'
+    ```
+    
+    The response contains the array of crawled internal and external links under the domain root.
+  </Step>
+
+  <Step title="Execute AI Deep Research">
+    Trigger recursive AI-powered deep research on any query topic. You specify the query and the max search depth.
+    
+    ```bash Curl
+    curl -X POST https://search.frenix.sh/v1/deep-research \
+      -H "Content-Type: application/json" \
+      -d '{
+        "query": "what is AI",
+        "maxDepth": 2
+      }'
+    ```
+
+    Returns a research tracking receipt containing a `jobId` to query research progress.
+  </Step>
 </Steps>
 
 ---

@@ -1,0 +1,43 @@
+---
+title: "Batch Scrape URLs"
+api: "POST /v1/batch/scrape"
+description: "Submit multiple target URLs for high-concurrency parallel scraping"
+---
+
+The batch scrape endpoint handles bulk operations. Instead of sending separate sequential requests to our single scrape endpoint, you can submit an array of URLs. Fearch will parse, load, and convert them to Markdown concurrently across available clustered nodes.
+
+This operation runs asynchronously and yields a tracking batch job receipt.
+
+---
+
+### Request Body
+
+<ParamField body="urls" type="array" placeholder="['https://example.com']" required>
+  An array containing absolute web page URLs to scrape concurrently. Maximum limit: `100` URLs per batch.
+</ParamField>
+
+---
+
+### Response Fields
+
+<ResponseField name="success" type="boolean" required>
+  Confirms the batch queue status. Returns `true` if the queue manager successfully registered the job.
+</ResponseField>
+
+<ResponseField name="jobId" type="string" required>
+  A unique uuid code identifying this concurrent batch execution. Use this to poll batch status.
+</ResponseField>
+
+<ResponseField name="status" type="string" required>
+  The starting state of the batch execution thread. Typically returns `"queued"`.
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "jobId": "batch-876a-9b8c",
+  "status": "queued"
+}
+```
+</ResponseExample>

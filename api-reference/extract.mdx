@@ -1,0 +1,58 @@
+---
+title: "Structured Extraction"
+api: "POST /v1/extract"
+description: "Extract highly-structured, schema-compliant JSON objects from any web page"
+---
+
+The extract endpoint converts messy HTML layouts into clean, validated, schema-compliant JSON data structures using fine-tuned AI intelligence. You define the target URL and provide a custom JSON schema; Fearch scrapes the page and extracts exact key-value objects matching your schema.
+
+This operation runs asynchronously and yields a tracking extractor job receipt.
+
+---
+
+### Request Body
+
+<ParamField body="url" type="string" placeholder="https://example.com/product" required>
+  The target absolute URL containing the unstructured text data to extract.
+</ParamField>
+
+<ParamField body="schema" type="object" required>
+  A JSON object mapping out the keys and data types you wish to retrieve.
+  
+  <Expandable title="Example Schema Model">
+    ```json
+    {
+      "title": "string",
+      "price": "string",
+      "rating": "number",
+      "features": "array"
+    }
+    ```
+  </Expandable>
+</ParamField>
+
+---
+
+### Response Fields
+
+<ResponseField name="success" type="boolean" required>
+  Confirms the queue status. Returns `true` if the extractor queued successfully.
+</ResponseField>
+
+<ResponseField name="jobId" type="string" required>
+  A unique uuid code identifying this extraction execution thread. Use this to poll extraction status.
+</ResponseField>
+
+<ResponseField name="status" type="string" required>
+  The starting state of the extraction pipeline. Typically returns `"queued"`.
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "jobId": "extract-443b-2a1c",
+  "status": "queued"
+}
+```
+</ResponseExample>

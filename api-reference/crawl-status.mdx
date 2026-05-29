@@ -1,0 +1,142 @@
+---
+title: "Crawl Control & Monitoring"
+api: "GET /v1/crawl/{jobId}"
+description: "Monitor crawl progress, fetch warning logs, review active queues, or cancel running crawl jobs"
+---
+
+Fearch provides thorough APIs to track, manage, filter, and cancel concurrent sitewide crawl operations.
+
+---
+
+### Path Parameters
+
+<ParamField path="jobId" type="string" placeholder="crawl-876a-9b8c" required>
+  The unique uuid code identifying the active crawl job.
+</ParamField>
+
+---
+
+### Response Fields
+
+<ResponseField name="success" type="boolean" required>
+  Confirms the status check was executed.
+</ResponseField>
+
+<ResponseField name="status" type="string" required>
+  The progress state of the crawler nodes. Values include:
+  - `queued`: Crawl task is in queue.
+  - `scraping`: Crawl nodes are actively crawling links.
+  - `completed`: Sitewide crawl has completed successfully.
+  - `cancelled`: Crawl execution was stopped by user.
+  - `failed`: Crawler encountered network-wide connection crashes.
+</ResponseField>
+
+<ResponseField name="progress" type="object">
+  Available during active states.
+  
+  <Expandable title="Progress Metrics">
+    <ResponseField name="pagesScraped" type="number">
+      The number of pages successfully crawled and mapped to Markdown.
+    </ResponseField>
+    <ResponseField name="pagesDiscovered" type="number">
+      The number of internal URLs discovered and added to the crawling queue.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK (Active Crawl Status)
+{
+  "success": true,
+  "jobId": "crawl-876a-9b8c",
+  "status": "scraping",
+  "progress": {
+    "pagesScraped": 4,
+    "pagesDiscovered": 18
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Cancel Running Crawl
+
+### `DELETE /v1/crawl/:jobId`
+
+Immediately halts active crawling threads. Staged markdown outputs parsed prior to termination remain valid, but no further links are crawled.
+
+```bash Curl
+curl -X DELETE https://search.frenix.sh/v1/crawl/crawl-876a-9b8c
+```
+
+### Response Example
+
+```json 200 OK
+{
+  "success": true,
+  "message": "Crawl job stopped successfully.",
+  "jobId": "crawl-876a-9b8c"
+}
+```
+
+---
+
+## Review Crawl Errors
+
+### `GET /v1/crawl/:jobId/errors`
+
+Retrieve a structural log of URLs that failed to render or crawl due to server resets (`500`), broken paths (`404`), or rigid anti-bot screens.
+
+```bash Curl
+curl -X GET https://search.frenix.sh/v1/crawl/crawl-876a-9b8c/errors
+```
+
+### Response Example
+
+```json 200 OK
+{
+  "success": true,
+  "jobId": "crawl-876a-9b8c",
+  "errors": [
+    {
+      "url": "https://example.com/private-panel",
+      "statusCode": 403,
+      "reason": "Forbidden"
+    },
+    {
+      "url": "https://example.com/broken-link",
+      "statusCode": 404,
+      "reason": "Not Found"
+    }
+  ]
+}
+```
+
+---
+
+## Active & Ongoing Crawls Queue
+
+### `GET /v1/crawl/active` & `GET /v1/crawl/ongoing`
+
+Query Fearch's concurrent queue managers to return lists of active and ongoing crawlers executing on behalf of your host IP.
+
+```bash Curl
+curl -X GET https://search.frenix.sh/v1/crawl/active
+```
+
+### Response Example
+
+```json 200 OK
+{
+  "success": true,
+  "activeJobsCount": 2,
+  "jobs": [
+    {
+      "jobId": "crawl-876a-9b8c",
+      "seedUrl": "https://example.com",
+      "startedAt": "2026-05-29T13:00:00Z"
+    }
+  ]
+}
+```

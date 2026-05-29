@@ -1,0 +1,45 @@
+---
+title: "llms.txt Builder Progress"
+api: "GET /v1/llmstxt/{jobId}"
+description: "Check the status of an llms.txt index generation job or fetch your completed file"
+---
+
+Monitor compilation progress and fetch generated `llms.txt` structures.
+
+---
+
+### Path Parameters
+
+<ParamField path="jobId" type="string" placeholder="llmstxt-990a-11b2" required>
+  The unique uuid code identifying the active `llms.txt` builder job.
+</ParamField>
+
+---
+
+### Response Fields
+
+<ResponseField name="success" type="boolean" required>
+  Confirms the status check succeeded.
+</ResponseField>
+
+<ResponseField name="status" type="string" required>
+  The execution status. Values include:
+  - `compiling`: Site mapping and summaries generation are in progress.
+  - `completed`: Index generation completed.
+  - `failed`: Domain is unreachable or builder failed.
+</ResponseField>
+
+<ResponseField name="fileContent" type="string">
+  Available once status is `completed`. Encloses the completed `llms.txt` contents.
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK (Completed llms.txt Builder)
+{
+  "success": true,
+  "jobId": "llmstxt-990a-11b2",
+  "status": "completed",
+  "fileContent": "# Example Domain Context\n\n> Useful information and links for AI models\n\n## Core Resources\n- [About](https://example.com/about) : Details company details and mission.\n- [API Guide](https://example.com/api) : Reference guides."
+}
+```
+</ResponseExample>

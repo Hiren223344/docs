@@ -1,0 +1,56 @@
+---
+title: "Advanced Scrape (Fireclaw)"
+api: "POST /v1/fireclaw"
+description: "Perform advanced scraping on heavily-protected, dynamically-rendered websites"
+---
+
+The Fireclaw endpoint is Fearch's premium advanced scraper. When standard scraping nodes encounter heavy anti-bot walls (like Cloudflare, Akamai, or Datadome) or require sophisticated custom browser actions (like scroll-downs, button clicks, or session preservation), Fireclaw spins up a highly-isolated headless context equipped with advanced fingerprint bypasses.
+
+---
+
+### Request Body
+
+<ParamField body="url" type="string" placeholder="https://protected-site.com" required>
+  The target absolute URL to scrape.
+</ParamField>
+
+<ParamField body="waitFor" type="number" placeholder="2000" default="2000">
+  Additional time (in milliseconds) the headless browser should wait after loading the DOM to allow dynamic JS widgets or sliders to finish rendering. Range: `0` to `10000`.
+</ParamField>
+
+---
+
+### Response Fields
+
+<ResponseField name="success" type="boolean" required>
+  Confirms the execution status. Returns `true` if the page bypass was successful.
+</ResponseField>
+
+<ResponseField name="data" type="object" required>
+  The main scraped contents.
+  
+  <Expandable title="Data Properties">
+    <ResponseField name="markdown" type="string" required>
+      The high-quality GFM Markdown content stripped of anti-bot text and boilerplate headers.
+    </ResponseField>
+    <ResponseField name="metadata" type="object" required>
+      Contains the HTTP `statusCode`, resolving `sourceURL`, and dynamic page metric parameters.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "data": {
+    "markdown": "# Protected Portal\n\nWelcome to the dashboard. This page was successfully scraped using Fireclaw's advanced headless browser context bypass.",
+    "metadata": {
+      "title": "Protected Portal",
+      "sourceURL": "https://protected-site.com/dashboard",
+      "statusCode": 200
+    }
+  }
+}
+```
+</ResponseExample>

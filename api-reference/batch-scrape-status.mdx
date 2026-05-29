@@ -1,0 +1,85 @@
+---
+title: "Batch Scrape Progress"
+api: "GET /v1/batch/scrape/{jobId}"
+description: "Track bulk scraping metrics, fetch parsed item arrays, or cancel running batch queues"
+---
+
+Evaluate the parsing progress of submitted bulk scrapers. Query active items, review success counts, and retrieve completed GFM markdown blocks.
+
+---
+
+### Path Parameters
+
+<ParamField path="jobId" type="string" placeholder="batch-876a-9b8c" required>
+  The unique uuid code identifying the active batch scraping job.
+</ParamField>
+
+---
+
+### Response Fields
+
+<ResponseField name="success" type="boolean" required>
+  Confirms the status check completed.
+</ResponseField>
+
+<ResponseField name="status" type="string" required>
+  The overall completion status of the batch. Values include:
+  - `queued`: Bulk request is waiting for worker allocations.
+  - `scraping`: Worker threads are scraping URLs concurrently.
+  - `completed`: All items in the batch have been processed.
+  - `cancelled`: Stopped by user commands.
+</ResponseField>
+
+<ResponseField name="totalItems" type="number" required>
+  The absolute count of URLs submitted in the batch.
+</ResponseField>
+
+<ResponseField name="processedItems" type="number" required>
+  The number of URLs that have finished processing.
+</ResponseField>
+
+<ResponseField name="results" type="array">
+  Available once items start completing. Contains array structures matching single scrape payloads.
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK (Batch Scraping Progress)
+{
+  "success": true,
+  "jobId": "batch-876a-9b8c",
+  "status": "scraping",
+  "totalItems": 10,
+  "processedItems": 4,
+  "results": [
+    {
+      "url": "https://example.com/item-1",
+      "status": "success",
+      "markdown": "# Item 1\n\nScraped content.",
+      "statusCode": 200
+    }
+  ]
+}
+```
+</ResponseExample>
+
+---
+
+## Cancel Running Batch Scrape
+
+### `DELETE /v1/batch/scrape/:jobId`
+
+Halt active bulk scrape workers immediately and release active thread allocations.
+
+```bash Curl
+curl -X DELETE https://search.frenix.sh/v1/batch/scrape/batch-876a-9b8c
+```
+
+### Response Example
+
+```json 200 OK
+{
+  "success": true,
+  "message": "Batch scrape task successfully aborted.",
+  "jobId": "batch-876a-9b8c"
+}
+```

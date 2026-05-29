@@ -1,0 +1,47 @@
+---
+title: "AI Deep Research"
+api: "POST /v1/deep-research"
+description: "Launch a recursive, multi-depth AI agent to research any query topic across the web"
+---
+
+The deep research endpoint triggers an autonomous AI agent to perform extensive research. Starting from your search terms, the agent queries Fearch's index, reads top-ranking pages, synthesizes facts, discovers new questions, and recursively clicks/searches deeper up to your configured `maxDepth`.
+
+This operation runs asynchronously and yields a tracking research job receipt.
+
+---
+
+### Request Body
+
+<ParamField body="query" type="string" placeholder="what is AI" required>
+  The core topic or research prompt to execute.
+</ParamField>
+
+<ParamField body="maxDepth" type="number" placeholder="2" default="2">
+  The maximum recursion depth of the web search. Range: `1` to `5`. Higher depth triggers longer, more extensive investigation threads.
+</ParamField>
+
+---
+
+### Response Fields
+
+<ResponseField name="success" type="boolean" required>
+  Confirms the queue status. Returns `true` if the deep research worker has been launched.
+</ResponseField>
+
+<ResponseField name="jobId" type="string" required>
+  A unique uuid code identifying this active deep research thread. Use this to poll research status.
+</ResponseField>
+
+<ResponseField name="status" type="string" required>
+  The starting state of the research agent. Typically returns `"queued"`.
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "jobId": "research-772c-88d9",
+  "status": "queued"
+}
+```
+</ResponseExample>

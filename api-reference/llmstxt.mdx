@@ -1,0 +1,43 @@
+---
+title: "Generate llms.txt"
+api: "POST /v1/llmstxt"
+description: "Generate a standard-compliant, semantic llms.txt index file for any web domain"
+---
+
+The llmstxt endpoint parses a target domain, crawls its pages, compiles their contents, and formats a standardized, highly readable `llms.txt` index file. This file contains a clear hierarchy of paths, titles, and brief summaries that help LLMs, crawlers, and AI systems navigate the site context.
+
+This operation runs asynchronously and yields a tracking builder job receipt.
+
+---
+
+### Request Body
+
+<ParamField body="url" type="string" placeholder="https://example.com" required>
+  The target domain URL to generate the `llms.txt` file for.
+</ParamField>
+
+---
+
+### Response Fields
+
+<ResponseField name="success" type="boolean" required>
+  Confirms the queue status. Returns `true` if the generator worker successfully launched.
+</ResponseField>
+
+<ResponseField name="jobId" type="string" required>
+  A unique uuid code identifying this active `llms.txt` builder job. Use this to poll generation status.
+</ResponseField>
+
+<ResponseField name="status" type="string" required>
+  The starting state of the builder worker thread. Typically returns `"queued"`.
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "jobId": "llmstxt-990a-11b2",
+  "status": "queued"
+}
+```
+</ResponseExample>
