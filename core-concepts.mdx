@@ -1,0 +1,70 @@
+---
+title: "Core Concepts"
+description: "Understand the underlying architecture and design decisions behind Fearch"
+---
+
+Fearch was built from the ground up to solve a singular problem: **making the web easily searchable and scrapable for machines, AI models, and developers.** 
+
+To achieve this, the platform relies on three core architectural pillars.
+
+---
+
+## 1. Zero-Auth Open API Architecture
+
+Traditional web scraping and search engines require complex key rotation, credit card setup, and subscription tiers before you can run a single query. Fearch removes all of these barriers.
+
+> [!NOTE]
+> **No Registration Required**: All Fearch endpoints are completely open and require no API key or token verification. This enables rapid prototyping and friction-free tool integration for LLM platforms.
+
+### Rate Limiting and Fair Use
+To prevent abuse while remaining completely free and open, Fearch utilizes a dynamic **IP-based sliding-window rate limiter**:
+- **Search Queries**: Up to 60 requests per minute per IP.
+- **Scrape Operations**: Up to 30 requests per minute per IP.
+- **Crawl Tasks**: Up to 5 concurrent active crawls per IP.
+
+If you exceed these limits, the API returns a standard `429 Too Many Requests` status code with a `Retry-After` header indicating when you can resume requests.
+
+---
+
+## 2. Clustered Headless Browser Pooling
+
+Modern web pages are highly dynamic. Much of their content is fetched asynchronously via API calls and rendered client-side using JavaScript frameworks like React, Next.js, and Vue. Standard HTTP requests (such as `axios` or `fetch`) only download the raw, empty HTML shell, missing the actual text.
+
+Fearch overcomes this by maintaining a warm pool of clustered headless browsers:
+
+```
+[Incoming Request] 
+      │
+      ▼
+┌──────────────┐
+│ Browser Pool │──► Recycles browser contexts dynamically
+└──────────────┘
+      │
+      ├─► Launch Sandbox Context
+      ├─► Spoof User-Agent & Fingerprints
+      ├─► Wait for network-idle state (up to 5000ms)
+      │
+      ▼
+[Fully Rendered DOM Snapshot]
+```
+
+### Key Optimizations:
+*   **Dynamic Wait States**: The engine monitors network traffic and waits for the page to reach `networkidle2` (fewer than 2 active network connections) so that asynchronously loaded content is fully captured.
+*   **Ad & Tracker Blocking**: Request interceptors block tracking scripts, advertising iframe payloads, and image downloads, speeding up rendering times by up to **65%**.
+*   **Fingerprint Rotation**: Automatically rotates canvas, WebGL, and HTTP headers to prevent anti-bot services (like Cloudflare or Akamai) from interrupting scrapers.
+
+---
+
+## 3. Heuristic Markdown Parsing
+
+Raw HTML is filled with boilerplate content: headers, navigation menus, footer links, cookie consent overlays, advertisement grids, and tracking scripts. Sending this raw markup directly to Large Language Models (LLMs) is expensive (using up context windows) and degrades response accuracy due to noise.
+
+Fearch runs a multi-layered **heuristic parsing pipeline** to clean the page:
+
+1.  **DOM Node Scoring**: We assign weights to nodes based on content density, text-to-tag ratios, and tag names. Main article structures (like `<article>`, `<main>`, class names containing `content`, `post`, etc.) receive high scores, while headers, footers, and sidebars are penalized.
+2.  **Semantic HTML Conversion**: Once the core content nodes are isolated, the engine converts them directly into standardized, readable Markdown syntax:
+    - Heading hierarchies (`<h1>` through `<h6>`) are preserved.
+    - Tables are formatted using GFM (GitHub Flavored Markdown) table syntax.
+    - Links are rewritten as inline references (`[Link Text](URL)`).
+    - Media, such as images, are extracted along with their alternative text attributes.
+3.  **Metadata Extraction**: Important fields like page titles, language tags, author names, open-graph cards, and HTTP status codes are returned separately in a `metadata` payload structure.

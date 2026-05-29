@@ -1,0 +1,160 @@
+---
+title: "UI Search Modal"
+description: "Implement interactive, hotkey-triggerable search interfaces with minimal lines of code"
+---
+
+Deliver a spectacular search experience to your end-users. Fearch allows you to easily connect our API endpoints to modern frontend components.
+
+Below is a complete, premium **React + Tailwind CSS** component illustrating how to implement a global Search Dialog with:
+- **Hotkey Activators**: Automatically listens to keyboard shortcuts (`Cmd + K` or `Ctrl + K`).
+- **Real-Time Autocomplete**: Queries Fearch search endpoints as the user types (with debouncing).
+- **Smooth Animations**: Animated modal fade-in and slide-down transitions.
+
+---
+
+## React Search Dialog Component
+
+You can drop this component directly into your React, Next.js, or Vite applications.
+
+```tsx SearchModal.tsx
+import React, { useState, useEffect, useRef } from "react";
+
+interface SearchResult {
+  title: string;
+  url: string;
+  snippet: string;
+  score: number;
+}
+
+export default function SearchModal() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // 1. Listen for global Hotkey activation (Cmd + K / Ctrl + K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setIsOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // 2. Focus input on open transition
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => searchInputRef.current?.focus(), 100);
+    } else {
+      setQuery("");
+      setResults([]);
+    }
+  }, [isOpen]);
+
+  // 3. Query Autocomplete with basic debouncing
+  useEffect(() => {
+    if (query.trim().length < 2) {
+      setResults([]);
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch("https://search.frenix.sh/v1/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query, limit: 5 }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          setResults(data.results);
+        }
+      } catch (err) {
+        console.error("Autocomplete search failed:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 250); // 250ms debounce time
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [query]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 bg-black/60 backdrop-blur-sm transition-all duration-300">
+      <div 
+        className="w-full max-w-2xl mt-20 overflow-hidden bg-slate-900 border border-slate-800 rounded-xl shadow-2xl shadow-indigo-500/10 transform transition-all duration-300"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Search Input Bar */}
+        <div className="relative flex items-center border-b border-slate-800 px-4">
+          <span className="text-xl text-slate-400">🔍</span>
+          <input
+            ref={searchInputRef}
+            type="text"
+            className="w-full h-14 bg-transparent outline-none border-none text-slate-100 placeholder-slate-500 px-3 text-lg"
+            placeholder="Type to search the web... (Esc to close)"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Escape" && setIsOpen(false)}
+          />
+          {isLoading && (
+            <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          )}
+        </div>
+
+        {/* Search Results Area */}
+        <div className="max-h-[350px] overflow-y-auto p-3">
+          {query.trim().length === 0 ? (
+            <div className="py-12 text-center text-slate-500">
+              <p className="text-sm">Search articles, domains, and scrapable docs</p>
+              <kbd className="inline-block px-2 py-1 mt-2 text-xs bg-slate-800 border border-slate-700 rounded text-slate-400">
+                ESC to close
+              </kbd>
+            </div>
+          ) : results.length > 0 ? (
+            <div className="space-y-2">
+              {results.map((item, index) => (
+                <a
+                  key={index}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block p-3 rounded-lg bg-slate-950/40 border border-slate-800/60 hover:border-indigo-500/50 hover:bg-slate-950/90 transition-all group"
+                >
+                  <div className="flex items-center justify-between">
+                    <h5 className="font-semibold text-indigo-400 group-hover:text-indigo-300 transition-colors">
+                      {item.title}
+                    </h5>
+                    <span className="text-xs font-mono bg-indigo-950/50 text-indigo-300 px-2 py-0.5 rounded border border-indigo-900/40">
+                      Relevance: {(item.score * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                    {item.snippet}
+                  </p>
+                  <span className="text-[10px] text-slate-600 block mt-2 truncate">
+                    {item.url}
+                  </span>
+                </a>
+              ))}
+            </div>
+          ) : (
+            !isLoading && (
+              <div className="py-12 text-center text-slate-500">
+                <p className="text-sm">No results matching "{query}"</p>
+              </div>
+            )
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+```

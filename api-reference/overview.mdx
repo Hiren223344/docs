@@ -1,0 +1,76 @@
+---
+title: "API Overview"
+description: "Core conventions, request structures, and standard protocols of the Fearch API"
+---
+
+The Fearch API is designed as a series of simple, clean, and highly performant RESTful HTTP endpoints. All request payloads and response bodies utilize standard UTF-8 JSON encoding.
+
+---
+
+## Connection Settings
+
+All API requests must be routed through our secure HTTPS gateway. Unsecured HTTP requests will be automatically redirected to secure TLS channels.
+
+| Attribute | Value |
+| :--- | :--- |
+| **Base URL** | `https://search.frenix.sh` |
+| **Transport Protocol** | HTTPS (TLS 1.3 recommended) |
+| **Content Type** | `application/json` (for POST requests) |
+
+---
+
+## Authentication Model
+
+<div style={{ display: "flex", alignItems: "center", gap: "15px", backgroundColor: "rgba(99, 102, 241, 0.1)", border: "1px solid rgba(99, 102, 241, 0.25)", padding: "16px", borderRadius: "8px", margin: "20px 0" }}>
+  <span style={{ fontSize: "28px" }}>🔓</span>
+  <div>
+    <h4 style={{ margin: 0, color: "#818cf8", fontSize: "16px", fontWeight: "600" }}>No Authentication Required</h4>
+    <p style={{ margin: "4px 0 0 0", fontSize: "14px", color: "#94a3b8" }}>
+      Fearch is an entirely open API. You do not need to generate API keys, configure Bearer headers, or authenticate requests. Start calling the endpoints directly from your code.
+    </p>
+  </div>
+</div>
+
+---
+
+## Standardized Responses
+
+Fearch endpoints return consistent envelopes so you can parse responses programmatically.
+
+### Success Envelope
+Successful scrape, search, or crawl commands return a standard JSON structure with a boolean `success` key set to `true`:
+
+```json Success Structure
+{
+  "success": true,
+  "data": {
+    // Endpoint-specific response contents
+  }
+}
+```
+
+### Error Envelope
+If an error occurs due to invalid input parameters, rate-limiting triggers, or backend crawler issues, Fearch returns an error object:
+
+```json Error Structure
+{
+  "success": false,
+  "error": {
+    "code": "INVALID_URL",
+    "message": "The provided URL is malformed or unreachable.",
+    "details": "Ensure the URL starts with http:// or https://"
+  }
+}
+```
+
+### HTTP Status Codes
+
+Fearch uses semantic HTTP status codes to indicate request outcomes:
+
+| Status Code | Meaning | Reason |
+| :--- | :--- | :--- |
+| `200 OK` | **Success** | The query executed successfully and returned results. |
+| `400 Bad Request` | **Client Error** | Required parameters are missing, or payload JSON is malformed. |
+| `404 Not Found` | **Resource Missing** | The requested job ID or scraper endpoint does not exist. |
+| `429 Too Many Requests` | **Rate Limited** | Request volume exceeds the allowed sliding-window threshold. |
+| `500 Server Error` | **System Failure** | The target website blocked our crawler nodes, or database engines timed out. |

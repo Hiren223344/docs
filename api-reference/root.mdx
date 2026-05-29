@@ -1,0 +1,28 @@
+---
+title: "API Root"
+api: "GET /"
+description: "Verify Fearch API health and retrieve documentation resources"
+---
+
+The root endpoint serves as a lightweight health check to confirm that the Fearch API gateway is operational and reachable. It returns basic system details and links to documentation resources.
+
+---
+
+### Response Payload
+
+<ResponseField name="message" type="string" required>
+  The name of the service, confirming status. Always returns `"Fearch API"`.
+</ResponseField>
+
+<ResponseField name="documentation_url" type="string" required>
+  The primary URL address of the documentation portal.
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "Fearch API",
+  "documentation_url": "https://docs.search.frenix.sh"
+}
+```
+</ResponseExample>

@@ -1,0 +1,140 @@
+---
+title: "SDKs & Clients"
+description: "Start integrating Fearch with your favorite languages and runtime platforms"
+---
+
+Integrate the Fearch API directly into your backend architecture. Below are standard, copy-pasteable client code integrations using native runtime features and popular HTTP libraries.
+
+---
+
+## 1. JavaScript & Node.js
+
+Perform searches and scraping from standard Javascript runtimes. No dependencies needed—uses the standard `fetch` API.
+
+```javascript Node.js Scrape Example
+const scrapeUrl = async (urlToScrape) => {
+  const response = await fetch("https://search.frenix.sh/v1/scrape", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ url: urlToScrape }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Scraping failed: ${response.statusText}`);
+  }
+
+  const result = await response.json();
+  
+  if (result.success) {
+    console.log("Markdown Content:\n", result.data.markdown);
+    console.log("Page Title:", result.data.metadata.title);
+  } else {
+    console.error("API returned error:", result.error);
+  }
+};
+
+// Execute
+scrapeUrl("https://example.com");
+```
+
+---
+
+## 2. Python
+
+Ingest clean Markdown payloads directly into LangChain, LlamaIndex, or raw Python models.
+
+```python Python Search Example
+import requests
+
+def fearch_search(query_term: str, limit: int = 5):
+    url = "https://search.frenix.sh/v1/search"
+    payload = {
+        "query": query_term,
+        "limit": limit
+    }
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        response.raise_for_status()
+        
+        data = response.json()
+        if data.get("success"):
+            print(f"Retrieved {len(data['results'])} search results for: '{query_term}'")
+            for idx, item in enumerate(data["results"], 1):
+                print(f"{idx}. {item['title']} - {item['url']} (Score: {item['score']})")
+        else:
+            print("API error:", data.get("error"))
+            
+    except requests.exceptions.RequestException as e:
+        print(f"HTTP Connection failed: {e}")
+
+# Execute
+fearch_search("bitcoin", limit=3)
+```
+
+---
+
+## 3. Go (Golang)
+
+Integrate Fearch into native Go API systems with high efficiency.
+
+```go Go Scrape Example
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"time"
+)
+
+type ScrapeRequest struct {
+	URL string `json:"url"`
+}
+
+type ScrapeResponse struct {
+	Success bool `json:"success"`
+	Data    struct {
+		Markdown string `json:"markdown"`
+		Metadata struct {
+			Title      string `json:"title"`
+			SourceURL  string `json:"sourceURL"`
+			StatusCode int    `json:"statusCode"`
+		} `json:"metadata"`
+	} `json:"data"`
+}
+
+func main() {
+	client := &http.Client{Timeout: 15 * time.Second}
+	
+	reqBody, _ := json.Marshal(ScrapeRequest{URL: "https://example.com"})
+	
+	resp, err := client.Post(
+		"https://search.frenix.sh/v1/scrape", 
+		"application/json", 
+		bytes.NewBuffer(reqBody),
+	)
+	if err != nil {
+		fmt.Printf("HTTP Post failed: %v\n", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	var result ScrapeResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		fmt.Printf("Decoding failed: %v\n", err)
+		return
+	}
+
+	if result.Success {
+		fmt.Printf("Scrape Success: %s (Status: %d)\n", result.Data.Metadata.Title, result.Data.Metadata.StatusCode)
+		fmt.Println("Content Snippet:\n", result.Data.Markdown[:200])
+	}
+}
+```

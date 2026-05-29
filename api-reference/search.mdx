@@ -1,0 +1,78 @@
+---
+title: "Search Query"
+api: "POST /v1/search"
+description: "Search web repositories and documents for relevant information"
+---
+
+The search endpoint allows your application to query web pages, databases, and general documents using a semantic query term. Fearch performs keyphrase extraction and returns a list of matching resources ranked by their relevance scores.
+
+---
+
+### Request Body
+
+<ParamField body="query" type="string" placeholder="bitcoin" required>
+  The keywords or search query to match against.
+</ParamField>
+
+<ParamField body="limit" type="number" placeholder="5" default="5">
+  The maximum number of search results to return. Range: `1` to `100`.
+</ParamField>
+
+---
+
+### Response Fields
+
+<ResponseField name="success" type="boolean" required>
+  Confirms the status of the operation. Returns `true` on successful queries.
+</ResponseField>
+
+<ResponseField name="query" type="string" required>
+  The parsed search query string matching the input.
+</ResponseField>
+
+<ResponseField name="limit" type="number" required>
+  The limit value that was applied to the results set.
+</ResponseField>
+
+<ResponseField name="results" type="array" required>
+  An array containing search hits matching your search terms.
+  
+  <Expandable title="Result Item Properties">
+    <ResponseField name="title" type="string" required>
+      The header or title metadata of the matching page.
+    </ResponseField>
+    <ResponseField name="url" type="string" required>
+      The absolute web link of the source.
+    </ResponseField>
+    <ResponseField name="snippet" type="string" required>
+      A text snippet from the page highlighting the matching keyword phrases.
+    </ResponseField>
+    <ResponseField name="score" type="number" required>
+      A decimal score (ranging from `0` to `1`) indicating relevance. Higher scores mean greater relevance.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "query": "bitcoin",
+  "limit": 5,
+  "results": [
+    {
+      "title": "Bitcoin - Open source P2P money",
+      "url": "https://bitcoin.org",
+      "snippet": "Bitcoin is an innovative payment network and a new kind of money. Find all you need to know and get started with Bitcoin on bitcoin.org.",
+      "score": 0.982
+    },
+    {
+      "title": "Bitcoin - Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Bitcoin",
+      "snippet": "Bitcoin is a decentralized digital currency, without a central bank or single administrator, that can be sent from user to user on the peer-to-peer bitcoin network.",
+      "score": 0.954
+    }
+  ]
+}
+```
+</ResponseExample>

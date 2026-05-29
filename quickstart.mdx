@@ -1,0 +1,89 @@
+---
+title: "Quickstart"
+description: "Get started with the Fearch API in less than two minutes"
+---
+
+Because Fearch is a fully open API, there are no authentication forms, developer registrations, or environment tokens required. You can start building search and scraping capabilities into your software instantly.
+
+Let's walk through how to execute your first requests using standard command-line tools.
+
+<Steps>
+  <Step title="Verify the API Status">
+    Let's check that the API is up and running. Send a simple `GET` request to our root endpoint.
+    
+    ```bash Curl
+    curl -X GET https://search.frenix.sh/
+    ```
+
+    You should immediately receive a JSON confirmation of the API health status:
+    
+    ```json Response
+    {
+      "message": "Fearch API",
+      "documentation_url": "https://docs.search.frenix.sh"
+    }
+    ```
+  </Step>
+
+  <Step title="Perform a Search Query">
+    Query Fearch to find relevant articles, web pages, or documents on any subject. We'll search for information on `"bitcoin"` and limit the results.
+    
+    ```bash Curl
+    curl -X POST https://search.frenix.sh/v1/search \
+      -H "Content-Type: application/json" \
+      -d '{
+        "query": "bitcoin",
+        "limit": 5
+      }'
+    ```
+
+    This POST request searches across available web databases and indexes, returning structured search hits with text previews and relevance scores.
+  </Step>
+
+  <Step title="Scrape a Web Page to Clean Markdown">
+    Extract clean, reader-friendly markdown from any web page. This spins up a headless browser, renders all Javascript, strips scripts, CSS, and navigation elements, and outputs pure markdown.
+    
+    ```bash Curl
+    curl -X POST https://search.frenix.sh/v1/scrape \
+      -H "Content-Type: application/json" \
+      -d '{
+        "url": "https://example.com"
+      }'
+    ```
+
+    The response returns a `"success"` indicator along with the stripped markdown content ready for ingestion.
+  </Step>
+
+  <Step title="Crawl an Entire Website">
+    Need to extract data across a whole site? Start a crawl job to navigate through pages up to your designated limit.
+    
+    ```bash Curl
+    curl -X POST https://search.frenix.sh/v1/crawl \
+      -H "Content-Type: application/json" \
+      -d '{
+        "url": "https://example.com",
+        "limit": 10
+      }'
+    ```
+
+    You will receive a job receipt containing a `jobId` so that you can monitor the crawl execution.
+  </Step>
+</Steps>
+
+---
+
+## Next Steps
+
+Now that you've run your first commands, dive deeper into the parameters, payloads, and integrations.
+
+<CardGroup cols={3}>
+  <Card title="Explore the API" icon="code" href="/api-reference/overview">
+    Check detailed request bodies and payload schemas for all endpoints.
+  </Card>
+  <Card title="Read Core Concepts" icon="brain" href="/core-concepts">
+    Learn how Fearch performs federated queries and handles JS rendering.
+  </Card>
+  <Card title="Response Formats" icon="database" href="/api-reference/overview#standardized-responses">
+    Understand the structured JSON structures returned by our nodes.
+  </Card>
+</CardGroup>

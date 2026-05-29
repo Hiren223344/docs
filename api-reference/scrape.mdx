@@ -1,0 +1,65 @@
+---
+title: "Scrape URL"
+api: "POST /v1/scrape"
+description: "Extract clean, readable Markdown content from any single web page"
+---
+
+The scrape endpoint spins up a headless browser, renders the destination website fully, resolves all dynamic Javascript network calls, and strips boilerplates. It returns high-quality, formatted Markdown content alongside structural page metadata.
+
+---
+
+### Request Body
+
+<ParamField body="url" type="string" placeholder="https://example.com" required>
+  The absolute URL of the web page to scrape. Must begin with `http://` or `https://`.
+</ParamField>
+
+---
+
+### Response Fields
+
+<ResponseField name="success" type="boolean" required>
+  Confirms the status of the operation. Returns `true` if the page was successfully loaded and parsed.
+</ResponseField>
+
+<ResponseField name="data" type="object" required>
+  The main payload containing the parsed page data.
+  
+  <Expandable title="Data Object Properties">
+    <ResponseField name="markdown" type="string" required>
+      The core page body content extracted, cleaned, and formatted using GFM Markdown syntax.
+    </ResponseField>
+    
+    <ResponseField name="metadata" type="object" required>
+      Basic scraping metrics and header properties retrieved from the rendered page DOM.
+      
+      <Expandable title="Metadata Properties">
+        <ResponseField name="title" type="string" required>
+          The HTML page title retrieved from the target.
+        </ResponseField>
+        <ResponseField name="sourceURL" type="string" required>
+          The final redirect-resolved destination URL of the source page.
+        </ResponseField>
+        <ResponseField name="statusCode" type="number" required>
+          The primary HTTP status code returned by the target web host (e.g., `200`).
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "data": {
+    "markdown": "# Example Domain\n\nThis domain is for use in illustrative examples in documents. You may use this domain in literature without prior coordination or asking for permission.\n\n[More information...](https://www.iana.org/domains/reserved)",
+    "metadata": {
+      "title": "Example Domain",
+      "sourceURL": "https://example.com",
+      "statusCode": 200
+    }
+  }
+}
+```
+</ResponseExample>
