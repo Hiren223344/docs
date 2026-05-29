@@ -5,11 +5,7 @@
   "colors": {
     "primary": "#6366f1",
     "light": "#a855f7",
-    "dark": "#6366f1",
-    "background": {
-      "light": "#ffffff",
-      "dark": "#0a0a0f"
-    }
+    "dark": "#6366f1"
   },
   "topbarLinks": [
     {
@@ -21,32 +17,34 @@
     "name": "Try Frenix",
     "url": "https://frenix.sh"
   },
-  "navigation": [
-    {
-      "group": "Getting Started",
-      "pages": [
-        "introduction",
-        "quickstart"
-      ]
-    },
-    {
-      "group": "API Reference",
-      "pages": [
-        "api-reference/overview",
-        "api-reference/root",
-        "api-reference/search",
-        "api-reference/scrape",
-        "api-reference/crawl"
-      ]
-    },
-    {
-      "group": "SDKs & Integrations",
-      "pages": [
-        "sdk-reference/overview",
-        "sdk-reference/ui-components"
-      ]
-    }
-  ],
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting Started",
+        "pages": [
+          "introduction",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "API Reference",
+        "pages": [
+          "api-reference/overview",
+          "api-reference/root",
+          "api-reference/search",
+          "api-reference/scrape",
+          "api-reference/crawl"
+        ]
+      },
+      {
+        "group": "SDKs & Integrations",
+        "pages": [
+          "sdk-reference/overview",
+          "sdk-reference/ui-components"
+        ]
+      }
+    ]
+  },
   "footerSocials": {
     "twitter": "https://x.com/frenix_sh",
     "github": "https://github.com/frenix-sh"
