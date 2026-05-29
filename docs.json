@@ -3,7 +3,9 @@
   "name": "Fearch",
   "theme": "mint",
   "api": {
-    "baseUrl": "https://search.frenix.sh"
+    "mdx": {
+      "server": "https://search.frenix.sh"
+    }
   },
   "colors": {
     "primary": "#6366f1",
